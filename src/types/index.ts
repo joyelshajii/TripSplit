@@ -90,6 +90,7 @@ export interface Trip {
   revision: number;
   lastConfirmedRevision?: number | null;
   confirmationHistory: TripConfirmationRecord[];
+  editKey?: string;
 }
 
 export interface MemberExpenseSummary {
