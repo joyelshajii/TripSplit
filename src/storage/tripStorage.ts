@@ -6,6 +6,7 @@ import {
   TripCalculationResult,
 } from '../types';
 import { rupeesToPaise } from '../utils/currency';
+import { saveTripEditKey } from '../services/tripPermissions';
 
 const STORAGE_KEY = 'tripsplit_v1_store';
 const CORRUPTED_BACKUP_KEY = 'tripsplit_corrupted_backup';
@@ -66,6 +67,14 @@ class TripStorageService {
         parsed.customCategories = [];
       }
 
+      // Ensure all trips have an editKey
+      parsed.trips.forEach((t: Trip) => {
+        if (!t.editKey) {
+          t.editKey = generateId('key');
+          saveTripEditKey(t.id, t.editKey);
+        }
+      });
+
       return parsed as StorageState;
     } catch (err) {
       console.error('Error reading storage, preserving backup:', err);
@@ -122,6 +131,7 @@ class TripStorageService {
       createdAt: now,
     }));
 
+    const editKey = generateId('key');
     const trip: Trip = {
       id: tripId,
       title: params.title.trim(),
@@ -135,8 +145,10 @@ class TripStorageService {
       revision: 1,
       lastConfirmedRevision: null,
       confirmationHistory: [],
+      editKey,
     };
 
+    saveTripEditKey(tripId, editKey);
     state.trips.push(trip);
     state.members.push(...members);
     this.writeState(state);
@@ -223,6 +235,41 @@ class TripStorageService {
     state.trips = state.trips.filter((t) => t.id !== id);
     state.members = state.members.filter((m) => m.tripId !== id);
     state.expenses = state.expenses.filter((e) => e.tripId !== id);
+    this.writeState(state);
+  }
+
+  public upsertTripFromCloud(cloudData: {
+    trip: Trip;
+    members: Member[];
+    expenses: Expense[];
+    customCategories?: string[];
+  }): void {
+    const state = this.readState();
+    const tIndex = state.trips.findIndex((t) => t.id === cloudData.trip.id);
+    if (tIndex >= 0) {
+      // Preserve existing trip object if cloudData is older or merge
+      state.trips[tIndex] = {
+        ...state.trips[tIndex],
+        ...cloudData.trip,
+      };
+    } else {
+      state.trips.push(cloudData.trip);
+    }
+
+    // Replace members for this trip
+    state.members = state.members.filter((m) => m.tripId !== cloudData.trip.id);
+    state.members.push(...cloudData.members);
+
+    // Replace expenses for this trip
+    state.expenses = state.expenses.filter((e) => e.tripId !== cloudData.trip.id);
+    state.expenses.push(...cloudData.expenses);
+
+    // Merge custom categories
+    if (cloudData.customCategories && Array.isArray(cloudData.customCategories)) {
+      const mergedCats = new Set([...(state.customCategories || []), ...cloudData.customCategories]);
+      state.customCategories = Array.from(mergedCats);
+    }
+
     this.writeState(state);
   }
 
