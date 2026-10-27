@@ -19,6 +19,7 @@ import {
   Users,
   ArrowDownLeft,
   ArrowUpRight,
+  Eye,
 } from 'lucide-react';
 
 export interface SettlementTabProps {
@@ -28,6 +29,7 @@ export interface SettlementTabProps {
   calculation: TripCalculationResult;
   onConfirmSettlement: () => void;
   onNavigateToExpenses: () => void;
+  isReadOnly?: boolean;
 }
 
 export const SettlementTab: React.FC<SettlementTabProps> = ({
@@ -36,6 +38,7 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
   expenses,
   calculation,
   onConfirmSettlement,
+  isReadOnly = false,
 }) => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -131,16 +134,23 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0 w-full sm:w-auto">
-            {!calculation.isFullySettled && (
-              <Button
-                variant="cyber"
-                size="md"
-                onClick={() => setIsReviewModalOpen(true)}
-                icon={<BadgeCheck className="w-4 h-4 stroke-[2.5]" />}
-                className="w-full sm:w-auto min-h-[42px]"
-              >
-                {hasUnconfirmedChanges ? 'Review & Reconfirm' : 'Review & Confirm'}
-              </Button>
+            {isReadOnly ? (
+              <span className="text-xs text-neutral-400 bg-white/5 border border-white/10 px-3.5 py-2 rounded-full flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5 text-neutral-400" />
+                <span>View-Only Mode</span>
+              </span>
+            ) : (
+              !calculation.isFullySettled && (
+                <Button
+                  variant="cyber"
+                  size="md"
+                  onClick={() => setIsReviewModalOpen(true)}
+                  icon={<BadgeCheck className="w-4 h-4 stroke-[2.5]" />}
+                  className="w-full sm:w-auto min-h-[42px]"
+                >
+                  {hasUnconfirmedChanges ? 'Review & Reconfirm' : 'Review & Confirm'}
+                </Button>
+              )
             )}
           </div>
         </div>
@@ -155,12 +165,14 @@ export const SettlementTab: React.FC<SettlementTabProps> = ({
                 The direct transfers below have been automatically recalculated.
               </div>
             </div>
-            <button
-              onClick={() => setIsReviewModalOpen(true)}
-              className="font-bold text-black bg-[#FDE047] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#FEF08A] shrink-0 cursor-pointer self-start sm:self-auto min-h-[36px]"
-            >
-              Reconfirm Now
-            </button>
+            {!isReadOnly && (
+              <button
+                onClick={() => setIsReviewModalOpen(true)}
+                className="font-bold text-black bg-[#FDE047] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#FEF08A] shrink-0 cursor-pointer self-start sm:self-auto min-h-[36px]"
+              >
+                Reconfirm Now
+              </button>
+            )}
           </div>
         )}
       </div>

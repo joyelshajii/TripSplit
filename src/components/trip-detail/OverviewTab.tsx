@@ -41,6 +41,7 @@ export interface OverviewTabProps {
   onAddExpense: () => void;
   onNavigateToExpenses: () => void;
   onNavigateToSettlement: () => void;
+  isReadOnly?: boolean;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -64,6 +65,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
   onAddExpense,
   onNavigateToExpenses,
   onNavigateToSettlement,
+  isReadOnly = false,
 }) => {
   const memberMap = new Map<string, Member>();
   members.forEach((m) => memberMap.set(m.id, m));
@@ -229,9 +231,11 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               Add fuel, dining, or ticket expenses to visualize spending breakdowns and member shares.
             </p>
           </div>
-          <Button variant="cyber" size="sm" onClick={onAddExpense} icon={<Plus className="w-4 h-4" />}>
-            Add First Expense
-          </Button>
+          {!isReadOnly && (
+            <Button variant="cyber" size="sm" onClick={onAddExpense} icon={<Plus className="w-4 h-4" />}>
+              Add First Expense
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">

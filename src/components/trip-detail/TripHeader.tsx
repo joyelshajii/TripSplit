@@ -18,6 +18,8 @@ import {
   Clock,
   Sparkles,
   Pencil,
+  Share2,
+  Eye,
 } from 'lucide-react';
 
 export type TripTab = 'overview' | 'expenses' | 'members' | 'settlement' | 'reports';
@@ -30,6 +32,8 @@ export interface TripHeaderProps {
   onBackToTrips: () => void;
   onAddExpense: () => void;
   onEditTrip: () => void;
+  onShareTrip: () => void;
+  isReadOnly?: boolean;
 }
 
 export const TripHeader: React.FC<TripHeaderProps> = ({
@@ -40,6 +44,8 @@ export const TripHeader: React.FC<TripHeaderProps> = ({
   onBackToTrips,
   onAddExpense,
   onEditTrip,
+  onShareTrip,
+  isReadOnly = false,
 }) => {
   const hasUnconfirmedChanges =
     trip.lastConfirmedRevision !== null &&
@@ -86,13 +92,24 @@ export const TripHeader: React.FC<TripHeaderProps> = ({
                 </span>
               )}
 
+              {!isReadOnly && (
+                <button
+                  onClick={onEditTrip}
+                  className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-black/10 hover:bg-black/20 text-black px-3 sm:px-3.5 py-1.5 rounded-full transition-all active:scale-95 cursor-pointer min-h-[38px]"
+                  title="Edit trip details"
+                >
+                  <Pencil className="w-3 h-3" />
+                  <span>Edit Trip</span>
+                </button>
+              )}
+
               <button
-                onClick={onEditTrip}
-                className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-black/10 hover:bg-black/20 text-black px-3 sm:px-3.5 py-1.5 rounded-full transition-all active:scale-95 cursor-pointer min-h-[38px]"
-                title="Edit trip details"
+                onClick={onShareTrip}
+                className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-black text-white hover:bg-neutral-900 px-3.5 sm:px-4 py-1.5 rounded-full transition-all active:scale-95 cursor-pointer min-h-[38px] shadow-lg"
+                title="Share trip with friends"
               >
-                <Pencil className="w-3 h-3" />
-                <span>Edit Trip</span>
+                <Share2 className="w-3.5 h-3.5 text-[#FDE047]" />
+                <span>Share</span>
               </button>
             </div>
           </div>
@@ -124,15 +141,22 @@ export const TripHeader: React.FC<TripHeaderProps> = ({
 
             {/* Quick Action */}
             <div className="w-full md:w-auto shrink-0">
-              <Button
-                variant="void"
-                size="lg"
-                onClick={onAddExpense}
-                icon={<Plus className="w-5 h-5 text-[#FDE047] stroke-[3]" />}
-                className="bg-black text-white hover:bg-[#1A1A1A] shadow-2xl w-full md:w-auto"
-              >
-                Add Expense
-              </Button>
+              {isReadOnly ? (
+                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-black/15 border border-black/20 text-black text-xs font-bold shadow-sm">
+                  <Eye className="w-4 h-4" />
+                  <span>View-Only Mode</span>
+                </div>
+              ) : (
+                <Button
+                  variant="void"
+                  size="lg"
+                  onClick={onAddExpense}
+                  icon={<Plus className="w-5 h-5 text-[#FDE047] stroke-[3]" />}
+                  className="bg-black text-white hover:bg-[#1A1A1A] shadow-2xl w-full md:w-auto"
+                >
+                  Add Expense
+                </Button>
+              )}
             </div>
           </div>
         </div>

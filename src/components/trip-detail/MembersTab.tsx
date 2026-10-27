@@ -30,6 +30,7 @@ export interface MembersTabProps {
   onRemoveMember: (memberId: string) => { archived: boolean; message: string };
   onEditExpense: (expense: Expense) => void;
   onViewMemberReport?: (memberId: string) => void;
+  isReadOnly?: boolean;
 }
 
 export const MembersTab: React.FC<MembersTabProps> = ({
@@ -41,6 +42,7 @@ export const MembersTab: React.FC<MembersTabProps> = ({
   onRemoveMember,
   onEditExpense,
   onViewMemberReport,
+  isReadOnly = false,
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
@@ -114,15 +116,17 @@ export const MembersTab: React.FC<MembersTabProps> = ({
           </p>
         </div>
 
-        <Button
-          variant="cyber"
-          size="sm"
-          onClick={() => setIsAddModalOpen(true)}
-          icon={<Plus className="w-4 h-4 stroke-[3]" />}
-          className="w-full sm:w-auto min-h-[40px]"
-        >
-          Add New Member
-        </Button>
+        {!isReadOnly && (
+          <Button
+            variant="cyber"
+            size="sm"
+            onClick={() => setIsAddModalOpen(true)}
+            icon={<Plus className="w-4 h-4 stroke-[3]" />}
+            className="w-full sm:w-auto min-h-[40px]"
+          >
+            Add New Member
+          </Button>
+        )}
       </div>
 
       {removalStatus && (
@@ -244,28 +248,32 @@ export const MembersTab: React.FC<MembersTabProps> = ({
               {/* Card Footer Actions */}
               <div className="pt-4 sm:pt-5 mt-4 sm:mt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMemberToRename(member);
-                      setRenameValue(member.name);
-                    }}
-                    className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-                    title="Rename member"
-                    aria-label="Rename member"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
+                  {!isReadOnly && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMemberToRename(member);
+                          setRenameValue(member.name);
+                        }}
+                        className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                        title="Rename member"
+                        aria-label="Rename member"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setMemberToRemove(member)}
-                    className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-full transition-colors"
-                    title="Remove or archive member"
-                    aria-label="Remove or archive member"
-                  >
-                    <Archive className="w-4 h-4" />
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => setMemberToRemove(member)}
+                        className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-full transition-colors"
+                        title="Remove or archive member"
+                        aria-label="Remove or archive member"
+                      >
+                        <Archive className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">

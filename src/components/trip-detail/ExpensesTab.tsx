@@ -29,6 +29,7 @@ export interface ExpensesTabProps {
   onEditExpense: (expense: Expense) => void;
   onDuplicateExpense: (expenseId: string) => void;
   onDeleteExpense: (expenseId: string) => void;
+  isReadOnly?: boolean;
 }
 
 export const ExpensesTab: React.FC<ExpensesTabProps> = ({
@@ -38,6 +39,7 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
   onEditExpense,
   onDuplicateExpense,
   onDeleteExpense,
+  isReadOnly = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -118,15 +120,17 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
             </select>
 
             {/* Manage Categories Button */}
-            <button
-              type="button"
-              onClick={() => setIsManageCategoriesOpen(true)}
-              className="w-full sm:w-auto px-3 sm:px-3.5 py-2 rounded-full bg-white/5 hover:bg-white/10 text-xs font-semibold text-neutral-300 hover:text-white border border-white/15 transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
-              title="Add or manage categories"
-            >
-              <Tag className="w-3.5 h-3.5 text-[#FDE047]" />
-              <span>Categories</span>
-            </button>
+            {!isReadOnly && (
+              <button
+                type="button"
+                onClick={() => setIsManageCategoriesOpen(true)}
+                className="w-full sm:w-auto px-3 sm:px-3.5 py-2 rounded-full bg-white/5 hover:bg-white/10 text-xs font-semibold text-neutral-300 hover:text-white border border-white/15 transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
+                title="Add or manage categories"
+              >
+                <Tag className="w-3.5 h-3.5 text-[#FDE047]" />
+                <span>Categories</span>
+              </button>
+            )}
 
             {/* Payer filter */}
             <select
@@ -144,15 +148,17 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
               ))}
             </select>
 
-            <Button
-              variant="cyber"
-              size="sm"
-              onClick={onAddExpense}
-              icon={<Plus className="w-4 h-4 stroke-[3]" />}
-              className="col-span-2 sm:col-span-1 w-full sm:w-auto min-h-[38px]"
-            >
-              Add Expense
-            </Button>
+            {!isReadOnly && (
+              <Button
+                variant="cyber"
+                size="sm"
+                onClick={onAddExpense}
+                icon={<Plus className="w-4 h-4 stroke-[3]" />}
+                className="col-span-2 sm:col-span-1 w-full sm:w-auto min-h-[38px]"
+              >
+                Add Expense
+              </Button>
+            )}
           </div>
         </div>
 
@@ -181,9 +187,11 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                 : 'Start adding expenses like fuel, meals, or hotel stays to compute fair shares.'}
             </p>
           </div>
-          <Button variant="cyber" size="sm" onClick={onAddExpense} icon={<Plus className="w-4 h-4" />}>
-            Record First Expense
-          </Button>
+          {!isReadOnly && (
+            <Button variant="cyber" size="sm" onClick={onAddExpense} icon={<Plus className="w-4 h-4" />}>
+              Record First Expense
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
@@ -264,33 +272,37 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => onEditExpense(exp)}
-                        className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-                        title="Edit expense"
-                        aria-label="Edit expense"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDuplicateExpense(exp.id)}
-                        className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-                        title="Duplicate expense"
-                        aria-label="Duplicate expense"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setExpenseToDelete(exp)}
-                        className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-full transition-colors"
-                        title="Delete expense"
-                        aria-label="Delete expense"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {!isReadOnly && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => onEditExpense(exp)}
+                            className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                            title="Edit expense"
+                            aria-label="Edit expense"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDuplicateExpense(exp.id)}
+                            className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                            title="Duplicate expense"
+                            aria-label="Duplicate expense"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setExpenseToDelete(exp)}
+                            className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-full transition-colors"
+                            title="Delete expense"
+                            aria-label="Delete expense"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
