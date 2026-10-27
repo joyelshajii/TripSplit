@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Trip } from '../../types';
 import { tripStorage } from '../../storage/tripStorage';
+import { syncTripToCloud, deleteTripFromCloud } from '../../services/cloudSync';
 import { calculateTripBalances } from '../../engine/calculation';
 import { formatINR } from '../../utils/currency';
 import { formatDate } from '../../utils/date';
@@ -53,8 +54,9 @@ export const TripList: React.FC<TripListProps> = ({
 
   const handleDuplicate = (tripId: string) => {
     try {
-      tripStorage.duplicateTrip(tripId);
+      const dup = tripStorage.duplicateTrip(tripId);
       onRefreshTrips();
+      syncTripToCloud(dup.id);
     } catch (err) {
       console.error(err);
     }
@@ -64,6 +66,7 @@ export const TripList: React.FC<TripListProps> = ({
     if (!tripToDelete) return;
     try {
       tripStorage.deleteTrip(tripToDelete.id);
+      deleteTripFromCloud(tripToDelete.id);
       onRefreshTrips();
     } catch (err) {
       console.error(err);
